@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .box {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            width: 350px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102,126,234,0.5);
+        }
+
+        .eye {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #msg {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Create Account</h2>
+
+    <div class="input-group">
+        <input type="text" id="username" placeholder="👤 Username">
+    </div>
+
+    <div class="input-group">
+        <input type="email" id="email" placeholder="📧 Email">
+    </div>
+
+    <div class="input-group">
+        <input type="password" id="password" placeholder="🔒 Password">
+        <span class="eye" onclick="togglePassword()" id="eye">👁️</span>
+    </div>
+
+    <button onclick="registerUser()">Register</button>
+
+    <p id="msg"></p>
+</div>
+
+<script>
+
+// 🔥 ADD THIS FUNCTION (missing tha)
+function togglePassword() {
+    const pass = document.getElementById("password");
+    const eye = document.getElementById("eye");
+
+    if (pass.type === "password") {
+        pass.type = "text";
+        eye.innerText = "🙈";
+    } else {
+        pass.type = "password";
+        eye.innerText = "👁️";
+    }
+}
+
+async function registerUser() {
+    const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const msg = document.getElementById("msg");
+
+    try {
+        const res = await fetch("http://localhost:3000/api/auth/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username, email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            msg.innerText = "✅ " + data.message;
+            msg.className = "success";
+
+            localStorage.setItem("token", data.token);
+
+            document.getElementById("username").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("password").value = "";
+
+        } else {
+            msg.innerText = "❌ " + data.error;
+            msg.className = "error";
+        }
+
+    } catch (err) {
+        msg.innerText = "⚠️ Server error";
+        msg.className = "error";
+        console.log(err);
+    }
+}
+</script>
+
+</body>
+</html>
